@@ -4,9 +4,12 @@
  ***********************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
+#include <sys/mman.h>
 #include "affinity.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +38,7 @@ int main(int argc, char *argv[])
   nc += sprintf(buf+nc, "%3d %s %3d CPUs: ",
 		rank, hostname, ncpus);
   nc += get_cpu_affinity(buf+nc);
+
 #ifdef HAVE_GPUS
   int ndevs = get_gpu_count();
   nc += sprintf(buf+nc, "%3d %s %3d GPUs: ",
@@ -42,6 +46,24 @@ int main(int argc, char *argv[])
   nc += get_gpu_affinity(buf+nc);
   if (verbose)
     nc += get_gpu_info_all(buf+nc);
+#endif
+
+#ifdef WITH_NUMA
+  size_t map_size;
+  void *ptr = alloc_mem(4*2*MB, &map_size);
+
+  if (ptr) {
+    char mpol[LONG_STR_SIZE];
+    get_mem_policy(mpol);
+
+    size_t npages, psize;
+    int numa = get_numa(getpid(), (uintptr_t)ptr, &npages, &psize);
+
+    nc += sprintf(buf+nc, "%3d %s %3s NUMA: %d %s %zuKB\n",
+		  rank, hostname, "", numa, mpol, psize);
+
+    munmap(ptr, map_size);
+  };
 #endif
 
   /* Print per-task information */
