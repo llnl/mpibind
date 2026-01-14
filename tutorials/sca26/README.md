@@ -75,14 +75,12 @@ srun -N1 -n1 mpi
 
 ## Workbook 
 
-Modules will be made available in Jan 2026. 
-
 1. [Discovering the node architecture topology](module1.md)
 
    Attendees will identify the compute and memory components of a compute node using hwloc, a widely-used and portable tool to query the hardware topology of a computer. This includes identifying the node’s GPUs, cores, hardware threads, cache hierarchy, NUMA domains, and network interfaces. Attendees will gain a deep understanding of the architectures of both Frontier and El Captian and will be able to query their topologies in a variety of ways. Furthermore, attendees will be introduced to locality and will identify local hardware resources. Attendees will also be provided with a tool for reporting the affinity of MPI processes, OpenMP threads, and GPU kernels.
 
 
-2. [Process affinity with Slurm on Frontier](module2.md)
+2. [Process affinity with Slurm](module2.md)
 
    Attendees will learn to use Slurm, the resource manager used on most supercomputers, to map MPI processes to the hardware at runtime when submitting a job. They will learn both, low-level (resource-specification driven) and high-level (policy driven) approaches for process mapping and affinity. For example, to provide low-level affinity, they will learn how to create affinity masks to specify custom sets of CPUs and map processes to them. Finally, attendees will learn several ways to enumerate MPI processes running on the machine. All of these concepts will be demonstrated using the compute architecture of Frontier.
 

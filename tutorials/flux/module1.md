@@ -104,7 +104,7 @@ the following simple and commonly used options:
 -n<ntasks>
 -c<ncores-per-task>
 -g<ngpus-per-task>
---exclusive
+--exclusive | -x
 ```
 
 First, let's obtain a node allocation to demonstrate some of these
@@ -267,6 +267,8 @@ run` interface. Here are the options we will use:
 -o gpu-affinity=map:<list>
 ```
 
+### `per-task`
+
 In the following example, we use `cpu-affinity` in conjuction with `-c`
 to ask Flux to bind each task to two cores. Note that if
 `cpu-affinity` is not used, each task is bound to all of the
@@ -355,7 +357,41 @@ rzadams1004 Task   0/  4 running on 4 CPUs: 88-89,184-185
 
 
 Nice. But, *locality* is not a primary consideration here:
-Only process 3 is using a local GPU. Ay.
+Only process 3 is using a local GPU.
+
+To overcome this limitation, a program can use all of the resources of a node. In this example, each task uses one GPU and 24 cores:
+
+<details>
+<summary>
+
+```
+$ flux run -N1 -n4 -c24 -g1 -o cpu-affinity=per-task -o gpu-affinity=per-task ./mpi+gpu
+```
+
+</summary>
+
+```
+  0 tuolumne1038   1 GPUs: 0000:02:00.0 
+  0 tuolumne1038  48 CPUs: 0-23,96-119
+  1 tuolumne1038   1 GPUs: 0001:02:00.0 
+  1 tuolumne1038  48 CPUs: 24-47,120-143
+  2 tuolumne1038   1 GPUs: 0002:02:00.0 
+  2 tuolumne1038  48 CPUs: 48-71,144-167
+  3 tuolumne1038   1 GPUs: 0003:02:00.0 
+  3 tuolumne1038  48 CPUs: 72-95,168-191
+```
+
+</details>
+
+
+Since this program uses all of the resources of a node, the above command can be simplified as follows:
+
+```
+$ flux run -N1 -n4 --exclusive -o cpu-affinity=per-task -o gpu-affinity=per-task ./mpi+gpu
+```
+
+
+### `map`
 
 Okay, we keep going: Let's ask Flux for one GPU per task and then we choose CPUs that are local to those GPUs. For this purpose, we will use the `map` clause
 of `cpu-affinity`. 
