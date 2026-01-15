@@ -29,6 +29,15 @@ Here is the node architecture of several Livermore Computing supercomputers. A s
     <td>4 HW threads</td>    
   </tr>
   <tr>
+    <th>Matrix</th>
+    <td>2 Intel Sapphire Rapids processors</td>
+    <td>4 NVIDIA H100 GPUs</td>
+    <td>4 NUMA domains</td>
+    <td>1 L3, 56 L2s, 56 L1s</td>
+    <td>56 cores</td>
+    <td>2 HW threads</td>    
+  </tr>
+  <tr>
     <th>Pascal</th>
     <td>2 Intel Broadwell processors</td>
     <td>2 NVIDIA Pascal GPUs</td>
@@ -64,30 +73,20 @@ Here is the node architecture of several Livermore Computing supercomputers. A s
     <td>64 cores</td>
     <td>2 HW threads</td>
   </tr>
-  <tr>
-    <th></th>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>    
-  </tr>
 </table>
 
-
-
-|<b> Tioga </b>|
-|:--:|
-|![Tioga](../figures/tioga-web.png "Tioga (MI250X)")|
-
-|<b> RZAdams </b>|
-|:--:|
-|![Tioga](../figures/rzadams-web.png "RZAdams (MI300A)")|
 
 |<b> Corona </b>|
 |:--:|
 |![Corona](../figures/corona-web.png "Corona")|
+
+|<b> Lassen </b>|
+|:--:|
+|![Lassen](../figures/lassen-web.png "Lassen")|
+
+|<b> Matrix </b>|
+|:--:|
+|![Matrix](../figures/matrix-web.png "Matrix")|
 
 |<b> Pascal </b>|
 |:--:|
@@ -97,9 +96,13 @@ Here is the node architecture of several Livermore Computing supercomputers. A s
 |:--:|
 |![Poodle](../figures/poodle-web.png "Poodle")|
 
-|<b> Lassen </b>|
+|<b> RZAdams </b>|
 |:--:|
-|![Lassen](../figures/lassen-web.png "Lassen")|
+|![Tioga](../figures/rzadams-web.png "RZAdams (MI300A)")|
+
+|<b> Tioga </b>|
+|:--:|
+|![Tioga](../figures/tioga-web.png "Tioga (MI250X)")|
 
 
 
