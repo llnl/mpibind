@@ -12,20 +12,20 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_SILENT_RULES([yes])
 
 
-## Check for programs 
-# pkg-config is discovered through PKG_PROG_PKG_CONFIG, 
+## Check for programs
+# pkg-config is discovered through PKG_PROG_PKG_CONFIG,
 # which detects the presence and version of pkg-config itself.
-# Need to make sure that pkg.m4 is in ACLOCAL_PATH, e.g, 
+# Need to make sure that pkg.m4 is in ACLOCAL_PATH, e.g,
 # ACLOCAL_PATH=$ACLOCAL_PATH:PKG_CONFIG_ROOT/share/aclocal
 # aclocal --print-ac-dir
 PKG_PROG_PKG_CONFIG
 
-# libtool 
+# libtool
 LT_INIT
 #AC_DISABLE_SHARED
 #AC_DISABLE_STATIC
 
-AC_PROG_CC_C99
+AC_PROG_CC
 AC_PROG_AWK
 AC_PROG_LN_S
 AC_PROG_MKDIR_P
@@ -93,7 +93,7 @@ PKG_CHECK_MODULES([SLURM], [slurm], [
 )
 AM_CONDITIONAL([HAVE_SLURM], [test x$slurm = xtrue])
 
-# Notes 
+# Notes
 # AC_DEFINE([HAVE_LIBTAP], 1, [Define libtap to build the test suite])
 # AC_CHECK_FUNC([hwloc_topology_set_all_types_filter])
 # AC_CHECK_HEADERS([pkgconf/libpkgconf/libpkgconf.h])
@@ -118,7 +118,7 @@ AC_SUBST(mpibindmoddir)
 # AC_CHECK_PYMOD(module, [action-if-found], [action-if-not-found])
 # ----------------------------------------------------------------
 # Didn't use AC_CACHE_CHECK because AC_CHECK_PYMOD
-# may be called multiple times, but with different arguments! 
+# may be called multiple times, but with different arguments!
 AC_DEFUN([AC_CHECK_PYMOD],
 [AC_REQUIRE([AM_PATH_PYTHON])
 AC_MSG_CHECKING([for $1 in python])
