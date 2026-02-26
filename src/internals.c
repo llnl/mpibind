@@ -978,6 +978,57 @@ int filter_gpu_types(hwloc_topology_t topo)
 }
 #endif
 
+
+/*
+ * Filter OS devices of interest and avoid duplicates
+ *
+ * Devices of interest:
+ * (1) GPU-type device (includes AMD-RSMI and NVIDIA-NVML)
+ * (2) OPENFABRICS-type device (includes InfiniBand)
+ * (3) COPROC-type: LevelZero device
+ * (4) NETWORK-type (includes Slingshot and BXI devices)
+ *
+ * I exclude CUDA and OpenCL COPROC devices to avoid
+ * duplication with NVML and RSMI devices
+ */
+static
+int keep_os_device(hwloc_obj_t obj)
+{
+  int num, rc=0;
+
+  switch (obj->attr->osdev.type) {
+  case HWLOC_OBJ_OSDEV_GPU:
+    rc = 1;
+    break;
+  case HWLOC_OBJ_OSDEV_COPROC:
+    if (obj_has_subtype(obj, "LevelZero"))
+      rc = 1;
+    break;
+  case HWLOC_OBJ_OSDEV_OPENFABRICS:
+    rc = 1;
+    break;
+  case HWLOC_OBJ_OSDEV_NETWORK:
+    if (obj_has_subtype(obj, "BXI"))
+      rc = 1;
+    else if (obj_has_subtype(obj, "Slingshot"))
+      /* Keep the CXI (Cassini) interfaces.
+	 libfabric uses the CXI provider to drive the
+	 Slingshot network.
+	 Linux, on the other hand, uses the HSI
+	 interfaces (TCP) */
+      if (sscanf(obj->name, "cxi%d", &num) == 1)
+	rc = 1;
+    break;
+  default:
+    rc = 0;
+  }
+
+  return rc;
+}
+
+
+
+
 /************************************************
  * Non-static functions.
  * Used by mpibind.c
@@ -1026,6 +1077,7 @@ int filter_gpu_types(hwloc_topology_t topo)
  * hfi1_0 OpenFabrics ___             ___            ___       NodeGUID
  * bxi0   Network     ___             ___            BXI       BXIUUID (hwloc 3)
  * hsi0   Network     ___             ___            Slingshot Address
+ * cxi0   Network     ___             ___            Slingshot
  */
 int discover_devices(hwloc_topology_t topo,
 		     struct device **devs, int size)
@@ -1052,18 +1104,7 @@ int discover_devices(hwloc_topology_t topo,
         continue;
       }
 
-      /* To add a device, it needs to be:
-	 (1) GPU-type device (includes AMD-RSMI and NVIDIA-NVML)
-	 (2) OPENFABRICS-type device (includes InfiniBand)
-	 (3) COPROC-type: LevelZero device
-	 (4) NETWORK-type (includes Slingshot and BXI devices)
-	 I exclude CUDA and OpenCL COPROC devices to avoid
-	 duplication with NVML and RSMI devices */
-      if ( (type == HWLOC_OBJ_OSDEV_COPROC &&
-	    !obj_has_subtype(obj, "LevelZero")) ||
-	   (type == HWLOC_OBJ_OSDEV_NETWORK &&
-	    !obj_has_subtype(obj, "Slingshot") &&
-	    !obj_has_subtype(obj, "BXI")) )
+      if (keep_os_device(obj) == 0)
 	continue;
 
       if (index >= size) {
