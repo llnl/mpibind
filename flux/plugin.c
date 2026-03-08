@@ -149,18 +149,16 @@ static
 int mpibind_task_init(flux_plugin_t *p, const char *topic,
 		       flux_plugin_arg_t *arg, void *data)
 {
-  int nvars, i;
-  char **env_var_values;
-
   //mpibind_t *mph = data;
   struct handle_and_opts *hdl = data;
   //todo: hdl->opts
 
   int taskid = get_taskid(p);
-  char **env_var_names = mpibind_get_env_var_names(hdl->mph,
-						   &nvars);
+  int nvars;
+  char **env_var_names = mpibind_get_env_var_names(hdl->mph, &nvars);
 
-  for (i=0; i<nvars; i++) {
+  char **env_var_values;
+  for (int i = 0; i < nvars; i++) {
     /* Tell mpibind to not set a variable */
     if ( (!strcmp(env_var_names[i], "OMP_PLACES") &&
 	  hdl->opts->omp_places) ||
