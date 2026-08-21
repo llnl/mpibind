@@ -5,6 +5,7 @@
 *Suzanne Parete-Koon*, Oak Ridge National Laboratory<br>
 *Jane E. Herriman*, Lawrence Livermore National Laboratory<br>
 *Tony Ramirez*, Oak Ridge National Laboratory<br>
+*Alan Longcoy, Oak Ridge National Laboratory<br>
 
 ## Description
 
@@ -62,7 +63,7 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal, and the `ssh
 
    Learn how to develop parallel applications using MPI (Message Passing Interface), a foundational programming model in high-performance computing. Through hands-on examples, participants will transform serial programs into parallel implementations, explore data distribution and inter-process communication, and gain practical experience executing applications across multiple processes.
 
-3. [AI-Enabled Scientific Data Analysis](https://github.com/suzannepk/anatomy_of_a_power_outage).<br>
+3. [AI-Enabled Scientific Data Analysis](https://github.com/suzannepk/K_means.git).<br>
    *Apply your HPC skills to a realistic scientific data analytics and machine learning problem.*
 
    Discover how HPC enables modern data science and machine learning through the analysis of real-world scientific data. Participants will work with outage data from the U.S. Department of Energy's EAGLE-I system, using MPI to preprocess and organize a large dataset before applying visualization techniques and the K-means clustering algorithm to identify patterns in outage behavior across regions and seasons.
