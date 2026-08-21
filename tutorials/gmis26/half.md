@@ -5,7 +5,7 @@
 *Suzanne Parete-Koon*, Oak Ridge National Laboratory<br>
 *Jane E. Herriman*, Lawrence Livermore National Laboratory<br>
 *Tony Ramirez*, Oak Ridge National Laboratory<br>
-*Alan Longcoy, Oak Ridge National Laboratory<br>
+*Alan Longcoy*, Oak Ridge National Laboratory<br>
 
 ## Description
 
