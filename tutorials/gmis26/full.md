@@ -125,7 +125,7 @@ srun -N1 -n1 mpi
 
    This module demonstrates how HPC, parallel programming, and machine learning complement one another to solve scientific and engineering problems.
 
-1. [Computing Architecture and Topology](module2.md).<br>
+1. [Computing Architecture and Topology](topology-module.md).<br>
 *Learn how HPC hardware is organized.*
 
    Learn how to identify the compute and memory components of a
