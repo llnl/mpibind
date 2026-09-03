@@ -21,7 +21,7 @@ These concepts provide the foundation for understanding not only how to write pa
 The workshop includes a hands-on module that demonstrates how HPC enables modern data science via machine learning and AI. Participants will work with real-world power outage data collected through the U.S. Department of Energy's EAGLE-I system, operated by Oak Ridge National Laboratory. Using parallel data processing with MPI, attendees will prepare and analyze a large dataset, visualize outage patterns, and apply the K-means clustering algorithm to identify similarities across geographic regions and seasons. By interpreting these clusters and relating them to seasonal weather trends, participants will develop hypotheses about the underlying causes of outages while gaining experience applying machine learning techniques to a real scientific dataset.
 
 Hands-on exercises are conducted on a supercomputer, providing participants with practical experience using real HPC systems throughout the workshop.
-By the end of the workshop, attendees will understand the fundamentals of HPC, parallel programming, hardware topology, resource affinity, and locality-aware application execution, as well as how these technologies enable modern scientific computing, machine learning, and data analytics. 
+By the end of the workshop, attendees will understand the fundamentals of HPC, parallel programming, hardware topology, resource affinity, and locality-aware application execution, as well as how these technologies enable modern scientific computing, machine learning, and data analytics.
 
 
 ## Learning Objectives
@@ -38,7 +38,7 @@ By the end of this workshop, participants will be able to:
 * Apply an introductory machine learning algorithm, K-means clustering, to identify patterns in real-world data.
 * Explain how HPC, data analytics, and AI work together to address scientific and engineering challenges.
 
-## Audience and Requirements 
+## Audience and Requirements
 
 Designed for undergraduate students, graduate students, faculty, and researchers seeking an introduction to HPC and its growing role in scientific computing and data science.
 
@@ -51,7 +51,7 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal,
 * Attendees should have a working knowledge of Unix-like systems. For
   example, they should know how to navigate a filesystem and launch
   applications from the command line.
-  
+
 * Attendees will also need some familiarity with high-level parallel
   programming concepts. For example, attendees should be comfortable
   with terms like thread, process, and GPU, but do not need experience
@@ -65,12 +65,12 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal,
 
 | Begin | End | Topic |
 |-:|-:|:-|
-| 08:00 | 08:15 | Paperwork | 
+| 08:00 | 08:15 | Paperwork |
 | 08:15 | 08:30 | Introduction to Supercomputing |
-| 08:30 | 09:30 | Module 1: Linux Basics | 
+| 08:30 | 09:30 | Module 1: Linux Basics |
 | 09:30 | 10:00 | Module 2: Parallel Computing with MPI |
 | *10:00* | *10:15* | *Break* |
-| 10:15 | 10:45 | Module 2: Continued | 
+| 10:15 | 10:45 | Module 2: Continued |
 | 10:45 | 11:30 | Module 3: AI-Enabled Scientific Data Analysis |
 | *11:30* | *12:00* | *Lunch* |
 | 12:00 | 12:45 | Module 3: Continued |
@@ -87,7 +87,7 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal,
 
 Accounts: `user5`, `user6`, ..., `user35`
 
-Password: 
+Password:
 
 ```
 ssh user5@
@@ -98,7 +98,7 @@ srun -N1 -n1 mpi
 ```
 -->
 
-## Notebook 
+## Notebook
 
 <!--
 <br>
@@ -135,7 +135,7 @@ srun -N1 -n1 mpi
    hardware threads, cache hierarchy, NUMA domains, and network
    interfaces. Furthermore, attendees will be introduced to locality,
    will identify local hardware resources, and will select resources
-   using affinity masks.  
+   using affinity masks.
 
 1. Hardware Affinity for Applications.<br>
 *Learn how to use that hardware efficiently.*
@@ -148,11 +148,6 @@ srun -N1 -n1 mpi
    manage CPU and GPU affinity concurrently to take advantage of local
    resources and reduce data movement.
 
-   1. [Mapping Processes to the Hardware](../eurosys25/module2.md)
-   
-   1. [Adding in GPU kernels](../eurosys25/module3.md)
+   1. [Mapping Processes to the Hardware](map-cpu.md)
 
-
-
-
-<!-- Apply everything you've learned to a realistic scientific data analytics and machine learning problem --> 
+   1. [Adding in GPU kernels](map-gpu.md)
