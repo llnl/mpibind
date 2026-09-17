@@ -21,7 +21,7 @@ Lawrence Livermore National Laboratory
    1. [Example mappings](#example-mappings)
    1. [Reporting affinity](#reporting-affinity)
    1. [Extra exercises](#extra-exercises)
-   1. [References](#references) 
+   1. [References](#references)
 1. Hardware Affinity for Applications
 
 
@@ -32,10 +32,10 @@ Lawrence Livermore National Laboratory
 * Learn how to use a few `hwloc` commands:
 	* `lstopo` to explore node topology
 	* `hwloc-calc` to calculate CPU masks
-	* `hwloc-bind` to bind processes to CPUs (sometimes via CPU masks) 
+	* `hwloc-bind` to bind processes to CPUs (sometimes via CPU masks)
 * Begin to understand "locality"
 * Understand the difference between affinity policies, binding, and mappings
-* Use a simple tool to identify resources available to particular processes 
+* Use a simple tool to identify resources available to particular processes
 
 ## Background
 
@@ -43,11 +43,11 @@ In this module, we'll start with an overview of some computer architecture termi
 
 We'll then introduce you to a library called `hwloc`, which will give us tools to explore the components of the nodes we see on our instances.
 
-Once we better understand the hardware we're working with, we'll explore how we can attach software processes to hardware. 
+Once we better understand the hardware we're working with, we'll explore how we can attach software processes to hardware.
 
 ### Computer architecture: Compute only
 
-Let's start by considering compute resources only (and ignoring memory). 
+Let's start by considering compute resources only (and ignoring memory).
 
 <img src="../figures/computing-architecture.png" width="600"/>
 
@@ -57,7 +57,7 @@ In our tree, we see **GPU**s, Graphical Processing Units, shown at the same leve
 
 Multiple cores and possibly one or more GPUs are included on a single processor. Each of these processors is a set of compute resources written onto a single piece of Silicon (a die).
 
-Finally, at the top of our tree is a node, which you can think of as a stand-alone computer. Modern nodes are often built from multiple processors, and the example architectures we'll consider each have two processors. 
+Finally, at the top of our tree is a node, which you can think of as a stand-alone computer. Modern nodes are often built from multiple processors, and the example architectures we'll consider each have two processors.
 
 #### Comprehension question 1
 
@@ -89,9 +89,9 @@ In the image below, consider a scenario where we have two processors and two sto
 
 <img src="../figures/numa.png" width="300"/>
 
-We can imagine scenarios where memory is laid out to be equidistant from multiple processors and where multiple processors are in the same NUMA domain. In the architectures we'll consider, however, there will be a one-to-one mapping between NUMA domains and processors. So, all computing resources on a Silicon die will be in the same NUMA domain and will have the same "local" memory. 
+We can imagine scenarios where memory is laid out to be equidistant from multiple processors and where multiple processors are in the same NUMA domain. In the architectures we'll consider, however, there will be a one-to-one mapping between NUMA domains and processors. So, all computing resources on a Silicon die will be in the same NUMA domain and will have the same "local" memory.
 
-Our references to "memory" above refer to memory that's transmitted over a frontside bus. In contrast, **cache memory** serves as a faster and closer source of memory, and different cores on the same processor and within the same NUMA domain may have access to different cache. 
+Our references to "memory" above refer to memory that's transmitted over a frontside bus. In contrast, **cache memory** serves as a faster and closer source of memory, and different cores on the same processor and within the same NUMA domain may have access to different cache.
 
 In general, cache levels are denoted as `L<N>` where `<N>` denotes the cache level. Lower values of `N` denote smaller and faster levels of cache. In the figure below, we see an example of what the cache hierarchy and layout might look like on a single processor.
 
@@ -101,7 +101,7 @@ In this example cache layout, there are three levels of cache -- `L1`, `L2`, and
 
 Throughout this tutorial, we'll be talking about "locality" and compute resources that are "local" to one another. For example, we might say that a given pair of resources "are local to one another". In this tutorial, when we say resources are local, that usually means those resources share the same NUMA domain. Resources can also be local in a stricter sense, i.e. by sharing L3 or L2 cache.
 
-#### Comprehension question 2 
+#### Comprehension question 2
 
 In the cache memory diagram above, how many cores are "local" with respect to a given L3 cache?
 
@@ -119,7 +119,7 @@ C.
 
 Each L3 cache has 6 cores.
 
-Each L2 cache has 2 cores, and there are 3 L2 caches per L3 cache. 
+Each L2 cache has 2 cores, and there are 3 L2 caches per L3 cache.
 
 </details>
 
@@ -131,7 +131,7 @@ The topologies of a few example architectures are summarized and diagramed [here
 
 We'll focus on `Tioga` and `RZAdams` --- early access systems for El Capitan --- in examples throughout the coming modules. `Tioga` has MI250X nodes (including MI250X GPUs) and `RZAdams` is composed of nodes with MI300A APUs!
 
-## The hwloc library 
+## The hwloc library
 
 ### What is hwloc?
 
@@ -141,7 +141,7 @@ We'll explore some of the basic commands in the sections below.
 
 Note that for this tutorial, `hwloc` is provided, so you won't need to install anything. Also note that a C API is also provied, though we'll be working with `hwloc` exclusively from the command line.
 
-### hwloc objects and indexes 
+### hwloc objects and indexes
 
 We concentrate on three classes of objects reported by hwloc objects -- memory objects, normal objects, and I/O objects. The image below summarizes these classes and how they further subdivide into `hwloc` object types, though it is not comprehensive:
 
@@ -174,12 +174,12 @@ The images used to visualize the topologies in the [Example Architectures](#exam
 <summary>
 
 ```
-janeh@tioga20:~$ lstopo-no-graphics 
+janeh@tioga20:~$ lstopo-no-graphics
 ```
 
 </summary>
 
-```                           
+```
 Machine (503GB total)
   Package L#0
     Group0 L#0
@@ -466,7 +466,7 @@ lstopo-no-graphics
 
 From here on out, we'll stick with `lstopo` for consistency.
 
-### Using synthetic topologies 
+### Using synthetic topologies
 
 In the `lstopo(-no-graphics)` example above, `lstopo` was run on the same node being investigated. `lstopo` also allows you to explore topologies of other machines/systems simply by specifying as an input a `.xml` file that provides information about the system.
 
@@ -480,7 +480,7 @@ tioga.xml
 rzadams.xml
 ```
 
-Using these files, you should be able to create the outputs for `lstopo-no-graphics` that you'd see on these respective machines, simply by adding `--input <machine name>.xml` to the commands shown above; as an example, 
+Using these files, you should be able to create the outputs for `lstopo-no-graphics` that you'd see on these respective machines, simply by adding `--input <machine name>.xml` to the commands shown above; as an example,
 
 ```
 lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml
@@ -1053,7 +1053,7 @@ A few other basic parameters can help to customize outputs, including `--merge`,
 `--merge` and `--no-useless-caches` respectively avoid showing levels and caches that don't have a hierarchical impact, and `--no-io` causes the topology to be described without IO devices.
 
 ```
-$ lstopo --merge 
+$ lstopo --merge
 ```
 
 <img src="../figures/tioga/tioga-merge.png" width="750"/>
@@ -1292,12 +1292,12 @@ srun: job 5318715 has been allocated resources
 srun: job 5318718 queued and waiting for resources
 srun: job 5318718 has been allocated resources
 112
-
+```
 We have 56 visible cores and 112 visible PUs. Because we have 2x as many visible PUs as visible cores, these nodes do support SMT.
 
 Frontier compute nodes have 64 physical CPU cores, but user allocations normally expose 56 cores because 8 cores are reserved for system use.
 
-```
+
 
 </details>
 
@@ -1324,9 +1324,9 @@ Now try
 lstopo  --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only PU | wc -l
 ```
 
-to see how many hardware threads there are on the same node. 
+to see how many hardware threads there are on the same node.
 
-For contrast, repeat the above using the file `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/tioga.xml`. 
+For contrast, repeat the above using the file `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/tioga.xml`.
 
 How many hardware threads are there per node on RZAdams and Tioga?
 
@@ -1436,8 +1436,8 @@ Remember that the login node and compute node expose different numbers of cores 
 **Bonus**: Can you use the `--physical` flag to see which 8 cores are reserved for system use on a Frontier compute node?
 <details>
 <summary>
-		
-Hint: There are two L3 cache per NUMA node, numbered 0 to 7. 
+
+Hint: There are two L3 cache per NUMA node, numbered 0 to 7.
 Use `hwloc-calc L3:7 --intersect core --physical` to show cores for the second L3 cache on NUMANode:3.
 
 </summary>
@@ -1446,20 +1446,21 @@ The first core of each L3 cache is reserved for system use on a compute node. (C
 
 For example,
 ```
-[user@login09.frontier ~]$ hwloc-calc L3:7 --intersect core --physical
-56,57,58,59,60,61,62,63
-[user@login09.frontier ~]$ srun -N1 -t1 hwloc-calc L3:7 --intersect core --physical
-srun: job 5351257 queued and waiting for resources
-srun: job 5351257 has been allocated resources
-57,58,59,60,61,62,63
 [user@login09.frontier ~]$ hwloc-calc L3:6 --intersect core --physical
 48,49,50,51,52,53,54,55
+[user@login09.frontier ~]$ hwloc-calc L3:7 --intersect core --physical
+56,57,58,59,60,61,62,63
+
 [user@login09.frontier ~]$ srun -N1 -t1 hwloc-calc L3:6 --intersect core --physical
 srun: job 5351263 queued and waiting for resources
 srun: job 5351263 has been allocated resources
 49,50,51,52,53,54,55
+[user@login09.frontier ~]$ srun -N1 -t1 hwloc-calc L3:7 --intersect core --physical
+srun: job 5351257 queued and waiting for resources
+srun: job 5351257 has been allocated resources
+57,58,59,60,61,62,63
 ```
-	
+
 </details>
 
 #### Hands-on exercise H: Determine the PUs associated with a given core (synthetic topologies)
@@ -1661,7 +1662,7 @@ Separately grabbing and adding the masks for cores 1 and 6:
 
 </details>
 
-## Binding to CPUs 
+## Binding to CPUs
 
 `hwloc-bind` can be used to bind a task to a particular set of compute resources using the syntax `hwloc-bind <compute resources: keywords or mask> -- <command to run on these resources>`:
 
@@ -1713,7 +1714,7 @@ When a mask is passed to `hwloc-bind`, the default behavior is that the mask is 
 hwloc-bind NUMAnode:1
 ```
 
-and 
+and
 
 ```
 hwloc-bind --cpubind NUMAnode:1
@@ -1919,7 +1920,7 @@ In the following, we'll use binaries called `mpi+gpu` and `mpi` to report the ma
 Usage is straightforward. Use the `-v` option for verbose GPU output and
 the `-h` option for help.
 
-The examples below should help to show how it works! To help illustrate what's going on, some examples will include schematics of tasks distributed across a Tioga node. Each Tioga node, with its 64 cores and 8 GPUs laid out across 4 NUMA domains, will be shown as 
+The examples below should help to show how it works! To help illustrate what's going on, some examples will include schematics of tasks distributed across a Tioga node. Each Tioga node, with its 64 cores and 8 GPUs laid out across 4 NUMA domains, will be shown as
 
 <img src="../figures/tioga/Tioga-Mod1-noprocs.png" width="550"/>
 
@@ -1956,20 +1957,20 @@ An MI250X has 64 cores and 8 GPUs split across 4 NUMAnodes. Here is a program ru
 <summary>
 
 ```
-$ srun -N 1 -t 1 -n 4 -c 16 --cpu-bind=core --gpu-bind=closest ./mpi+gpu 
+$ srun -N 1 -t 1 -n 4 -c 16 --cpu-bind=core --gpu-bind=closest ./mpi+gpu
 ```
 
 </summary>
 
 ```
 tioga12    Task   1/  4 running on 32 CPUs: 16-31,80-95
-           Task   1/  4 has 2 GPUs: 0000:c9 0000:ce 
+           Task   1/  4 has 2 GPUs: 0000:c9 0000:ce
 tioga12    Task   2/  4 running on 32 CPUs: 32-47,96-111
-           Task   2/  4 has 2 GPUs: 0000:d9 0000:de 
+           Task   2/  4 has 2 GPUs: 0000:d9 0000:de
 tioga12    Task   0/  4 running on 32 CPUs: 0-15,64-79
-           Task   0/  4 has 2 GPUs: 0000:d1 0000:d6 
+           Task   0/  4 has 2 GPUs: 0000:d1 0000:d6
 tioga12    Task   3/  4 running on 32 CPUs: 48-63,112-127
-           Task   3/  4 has 2 GPUs: 0000:c1 0000:c6 
+           Task   3/  4 has 2 GPUs: 0000:c1 0000:c6
 ```
 
 <img src="../figures/tioga/Tioga-Mod1-Ex6.png" width="550"/>
@@ -2062,16 +2063,16 @@ Here we see run a program with 2 processes on `Tioga MI250X`, where all the reso
 
 
 ```
-$ srun -N 1 -t 1 -n 2 -c 32 --cpu-bind=core --gpu-bind=closest  ./mpi+gpu 
+$ srun -N 1 -t 1 -n 2 -c 32 --cpu-bind=core --gpu-bind=closest  ./mpi+gpu
 ```
 
 </summary>
 
 ```
 tioga12    Task   0/  2 running on 64 CPUs: 0-31,64-95
-           Task   0/  2 has 4 GPUs: 0000:c9 0000:ce 0000:d1 0000:d6 
+           Task   0/  2 has 4 GPUs: 0000:c9 0000:ce 0000:d1 0000:d6
 tioga12    Task   1/  2 running on 64 CPUs: 32-63,96-127
-           Task   1/  2 has 4 GPUs: 0000:c1 0000:c6 0000:d9 0000:de 
+           Task   1/  2 has 4 GPUs: 0000:c1 0000:c6 0000:d9 0000:de
 ```
 
 
@@ -2120,7 +2121,7 @@ Afterwards, you can check yourself with [this picture of a Frontier node](../fig
 <summary>
 
 What to run
-	
+
 </summary>
 
 ```
