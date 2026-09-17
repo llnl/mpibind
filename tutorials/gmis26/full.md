@@ -107,7 +107,7 @@ srun -N1 -n1 mpi
 </p>
 -->
 
-1. Linux Basics.<br>*Learn to use an HPC system.*
+1. [Linux Basics](/tutorials/gmis26/cheat_sheet.md)<br>*Learn to use an HPC system.*
 
    Learn the essentials of working in Linux systems, which form the backbone of most HPC environments. This module introduces participants to foundational Linux concepts, including navigating the file system, managing and searching files, and performing basic edits with the popular text editor `vim`. By the end, participants will be comfortable moving around a Linux system and handling core tasks needed for effective HPC use.
 
