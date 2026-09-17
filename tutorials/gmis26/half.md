@@ -13,7 +13,7 @@ This accelerated workshop provides an interactive introduction to High-Performan
 
 The workshop concludes with a hands-on module that demonstrates how HPC enables modern data science and AI. Participants will work with real-world power outage data collected through the U.S. Department of Energy's EAGLE-I system, operated by Oak Ridge National Laboratory. Using parallel data processing with MPI, attendees will prepare and analyze a large dataset, visualize outage patterns, and apply the K-means clustering algorithm to identify similarities across geographic regions and seasons. By interpreting these clusters and relating them to seasonal weather trends, participants will develop hypotheses about the underlying causes of outages while gaining experience applying machine learning techniques to a real scientific dataset.
 
-Hands-on exercises are conducted on a supercomputer, providing participants with practical experience using real HPC systems throughout the workshop. By the end of the workshop, attendees will understand the fundamentals of HPC, parallel programming, and how these technologies enable modern scientific computing and AI-enabled data analytics. 
+Hands-on exercises are conducted on a supercomputer, providing participants with practical experience using real HPC systems throughout the workshop. By the end of the workshop, attendees will understand the fundamentals of HPC, parallel programming, and how these technologies enable modern scientific computing and AI-enabled data analytics.
 
 ## Learning Objectives
 
@@ -34,15 +34,15 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal, and the `ssh
 
 
 
-## Schedule 
+## Schedule
 
 <center>
 
 | Begin | End | Topic |
 |-:|-:|:-|
-| 08:00 | 08:15 | Paperwork | 
+| 08:00 | 08:15 | Paperwork |
 | 08:15 | 08:30 | Introduction to Supercomputing |
-| 08:30 | 09:15 | Module 1: Linux Basics | 
+| 08:30 | 09:15 | Module 1: Linux Basics |
 | 09:15 | 10:15 | Module 2: Parallel Computing with MPI |
 | *10:15* | *10:30* | *Break* |
 | 10:30 | 12:00 | Module 3: AI-Enabled Scientific Data Analysis |
@@ -64,11 +64,11 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal, and the `ssh
    Learn how to develop parallel applications using MPI (Message Passing Interface), a foundational programming model in high-performance computing. Through hands-on examples, participants will transform serial programs into parallel implementations, explore data distribution and inter-process communication, and gain practical experience executing applications across multiple processes.
 
 3. [AI-Enabled Scientific Data Analysis](https://github.com/suzannepk/K_means.git).<br>
-   *Apply your HPC skills to a realistic scientific data analytics and machine learning problem.*
+   *Apply your HPC skills to a realistic scientific data analytics and machine learning problem.*<br>
+   [Slides](k-means-final.pdf).
 
    Discover how HPC enables modern data science and machine learning through the analysis of real-world scientific data. Participants will work with outage data from the U.S. Department of Energy's EAGLE-I system, using MPI to preprocess and organize a large dataset before applying visualization techniques and the K-means clustering algorithm to identify patterns in outage behavior across regions and seasons.
 
    Participants will interpret the resulting clusters, formulate hypotheses about the environmental and seasonal factors influencing power outages, and explore how computational methods support energy resilience and disaster response.
 
    This capstone module demonstrates how parallel programming, scientific data analysis, and machine learning come together to solve real-world problems using HPC.
-

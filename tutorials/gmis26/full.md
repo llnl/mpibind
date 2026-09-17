@@ -117,7 +117,8 @@ srun -N1 -n1 mpi
    Learn how to develop parallel applications using MPI (Message Passing Interface), a foundational tool in high-performance computing. This module introduces the principles of parallel thinking and guides participants through the transformation of serial code into parallel implementations using MPI. Through hands-on examples you’ll explore data distribution, rank-based processing, and communication overhead, while gaining practical experience running programs across multiple processes. By the end, you'll understand how to analyze performance, improve efficiency, and apply these techniques to more complex real-world problems.
 
 1. [AI-Enabled Scientific Data Analysis](https://github.com/suzannepk/K_means.git).<br>
-*Apply parallel programming and machine learning to address a scientific data analytics problem.*
+*Apply parallel programming and machine learning to address a scientific data analytics problem.*<br>
+   [Slides](k-means-final.pdf).
 
    Discover how HPC enables modern data science and machine learning through the analysis of real-world scientific data. Participants will work with outage data from the U.S. Department of Energy's EAGLE-I system, which monitors electric power disruptions across the United States.
 
