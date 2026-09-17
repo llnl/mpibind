@@ -53,7 +53,7 @@ Attendees will need a laptop equipped with Wi-Fi, a shell terminal, and the `ssh
 
 ## Notebook
 
-1. UNIX Basics.<br>
+1. [UNIX Basics](/tutorials/gmis26/cheat_sheet.md).<br>
    *Learn to use an HPC system.*
 
    Learn the essentials of working in Linux systems, which form the backbone of most HPC environments. This module introduces participants to foundational UNIX concepts, including navigating the file system, managing and searching files, and performing basic edits with the text editor `vim`. By the end, participants will be comfortable moving around a Linux system and performing the core tasks required for effective HPC use.
