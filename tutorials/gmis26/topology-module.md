@@ -1377,9 +1377,15 @@ First off, without even worrying about CPU masks, we can use `hwloc-calc` to lis
 # Get the cores on the first NUMA node
 janeh@tioga20:~$ hwloc-calc NUMAnode:0 --intersect core
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+```
+
+```
 # Get the cores on the fourth NUMA node
 janeh@tioga20:~$ hwloc-calc NUMAnode:3 --intersect core
 48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
+```
+
+```
 # Get the PUs on core 8 of the first NUMA node
 janeh@tioga20:~$ hwloc-calc NUMAnode:0.core:8 --intersect PU
 16,17
@@ -1419,12 +1425,16 @@ Expected output
 ```
 [user@login07.frontier ~]$ hwloc-calc NUMAnode:0 --intersect core
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+
 [user@frontier08594 ~]$ srun -N 1 -t 1 hwloc-calc NUMAnode:0 --intersect core
 0,1,2,3,4,5,6,7,8,9,10,11,12,13
+
 [user@frontier08594 ~]$ srun -N 1 -t 1 hwloc-calc NUMAnode:1 --intersect core
 14,15,16,17,18,19,20,21,22,23,24,25,26,27
+
 [user@frontier08594 ~]$ srun -N 1 -t 1 hwloc-calc NUMAnode:2 --intersect core
 28,29,30,31,32,33,34,35,36,37,38,39,40,41
+
 [user@frontier08594 ~]$ srun -N 1 -t 1 hwloc-calc NUMAnode:3 --intersect core
 42,43,44,45,46,47,48,49,50,51,52,53,54,55
 ```
