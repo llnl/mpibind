@@ -24,6 +24,7 @@ Lawrence Livermore National Laboratory
 1. [Mapping Kernels to GPUs](map-gpu.md)
 1. [Resource Manager Affinity with Flux](flux.md)
 1. [Automatic Affinity with mpibind](mpibind.md)
+1. [MPI Observations](mpi-misc.md)
 1. [MPI load imbalance](mpip.md)
 
 <!--
