@@ -17,8 +17,9 @@ Lawrence Livermore National Laboratory
 
 ## Learning objectives
 
+* Learn how to launch Flux inside another resource manager
 * Understand locality on the MI300A APU
-* Get acquainted with common flux commands like `flux alloc` and `flux run`
+* Get acquainted with common flux commands
 * Observe how tasks in Flux are assigned to CPU & GPU resources by default
 * Learn how to change affinity policies in flux for CPU & GPU resources to
    * force tasks to spread out across available resources
@@ -135,11 +136,128 @@ execute `flux resource list`
 
 ## Launching and tracking Flux jobs
 
-https://hpc-tutorials.llnl.gov/flux/section2/
+Relevant commands
 
-#### Hands-on exercise: Launching and tracking job steps
+```
+flux run
+flux submit
+flux jobs
+flux job attach|cancel
+```
+
+### Blocking and non-blocking jobs
+
+In Flux, one can launch blocking and non-blocking jobs. We are already
+familiar with blocking jobs, e.g., when launching an `srun` job in
+Slurm. In Flux, we can run a blocking job using the `flux run`
+command:
+
+``` bash
+# Assumes we are already within a Flux allocation
+$ flux run -N1 -n4 sh -c 'mpi; sleep 3'
+  0 lrdn4981.leonardo.local   1 CPUs: 0
+  1 lrdn4981.leonardo.local   1 CPUs: 1
+  2 lrdn4981.leonardo.local   1 CPUs: 2
+  3 lrdn4981.leonardo.local   1 CPUs: 3
+```
+
+The run command blocks until the program completes.
+
+We can also submit commands that are simply enqueued for execution; the issuing command will return immediately:
+
+``` bash
+$ flux submit -N1 -n4 --output=job{{jobid}}.out sh -c 'sleep 10; mpi'
+ƒ3fXuX5dR
+
+$ tail -f jobƒ3fXuX5dR.out
+  1 lrdn4981.leonardo.local   1 CPUs: 1
+  3 lrdn4981.leonardo.local   1 CPUs: 3
+  0 lrdn4981.leonardo.local   1 CPUs: 0
+  2 lrdn4981.leonardo.local   1 CPUs: 2
+^C
+```
+
+Note that Flux has templates that are replaced by job details once
+available. A *mustache template* is a tag in double braces, e.g.,
+`{{tag}}`
+
+In addition, Flux has a nice feature allowing us to replicate a job
+several times
+with one launch command:
+
+``` bash
+# Replicate the job for each id in IDSET
+--cc=IDSET
+```
+
+One can use the environment variable `FLUX_JOB_CC` or the substitution
+string `{cc}` to get the id of that specific job.
+
+Let's see an example using non-blocking jobs:
+
+<!--
+$ flux submit -N1 -n1 -c48 --cc=1-2 --output=jobx{cc}.out sh -c 'mpi;
+sleep 3'
+-->
+
+``` bash
+$ flux submit -N1 -n4 --cc=1-2,5-7 --output=jobx{cc}.out sh -c 'sleep 60; mpi'
+ƒ68Xd1LYF
+ƒ68Xd1LYG
+ƒ68XeVKpb
+ƒ68XfyK6w
+ƒ68XfyK6x
+
+$ ls jobx*out
+jobx1.out  jobx2.out  jobx5.out  jobx6.out  jobx7.out
+```
+
+### Managing jobs
+
+Now that we know how to submit blocking and non-blocking jobs, we need
+a way to manage them.
+
+First, we can use the `flux jobs` command to see the status of all of
+our jobs:
+
+``` bash
+$ flux jobs
+       JOBID USER     NAME       ST NTASKS NNODES     TIME INFO
+   ƒ68XfyK6x eleonbor sh          R      4      1   2.408s lrdn4981.leonardo.local
+   ƒ68XfyK6w eleonbor sh          R      4      1   2.408s lrdn4981.leonardo.local
+   ƒ68XeVKpb eleonbor sh          R      4      1   2.408s lrdn4981.leonardo.local
+   ƒ68Xd1LYG eleonbor sh          R      4      1   2.408s lrdn4981.leonardo.local
+   ƒ68Xd1LYF eleonbor sh          R      4      1   2.408s lrdn4981.leonardo.local
+```
+
+In addition we can manage jobs individually using the `flux job` and
+`flux cancel` commands.
+
+For example, we can terminate a job with `flux cancel <jobid>` or attach
+ to a running (non-blocking) job with `flux job attach <jobid>`
+
+``` bash
+$ flux cancel ƒ68Xd1LYF
+
+$ flux jobs
+       JOBID USER     NAME       ST NTASKS NNODES     TIME INFO
+   ƒ68XfyK6x eleonbor sh          R      4      1   13.28s lrdn4981.leonardo.local
+   ƒ68XfyK6w eleonbor sh          R      4      1   13.28s lrdn4981.leonardo.local
+   ƒ68XeVKpb eleonbor sh          R      4      1   13.28s lrdn4981.leonardo.local
+   ƒ68Xd1LYG eleonbor sh          R      4      1   13.28s lrdn4981.leonardo.local
+
+# Block until the job completes
+$ flux job attach ƒ68Xd1LYG
+[0-3]: stdout redirected to jobx2.out
+[0-3]: stderr redirected to jobx2.out
+$
+```
+
+
+### Hands-on exercise: Launching and tracking job steps
 
 https://hpc-tutorials.llnl.gov/flux/exercises/exercise2/
+
 
 
 
@@ -573,6 +691,7 @@ rzadams1004 Task   0/  1 running on 24 CPUs: 0-23
 
 * [Intro to Flux](https://hpc-tutorials.llnl.gov/flux/)
 * [flux-run](https://flux-framework.readthedocs.io/projects/flux-core/en/latest/man1/flux-run.html)
+* [flux-submit](https://flux-framework.readthedocs.io/projects/flux-core/en/stable/man1/flux-submit.html)
 * [flux-shell](https://flux-framework.readthedocs.io/projects/flux-core/en/latest/man1/flux-shell.html)
 * [Flux documentation](https://flux-framework.readthedocs.io/en/latest/)
 * [Flux tutorials](https://github.com/flux-framework/Tutorials)

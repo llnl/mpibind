@@ -16,7 +16,7 @@ Lawrence Livermore National Laboratory
    1. [Binding vs. affinity vs. mappings](#definitions)
    1. [Example mappings](#example-mappings)
    1. [Reporting affinity](#reporting-affinity)
-   1. [Extra exercises](#extra-exercises)
+   1. [Hands-on exercises](#hands-on-exercises)
    1. [References](#references)
 
 
@@ -25,13 +25,13 @@ Lawrence Livermore National Laboratory
 ## Learning objectives
 
 * Review basics of computer architecture, as needed for this module
-* Learn how to use a few `hwloc` commands:
+* Learn how to use key `hwloc` commands:
 	* `lstopo` to explore node topology
 	* `hwloc-calc` to calculate CPU masks
 	* `hwloc-bind` to bind processes to CPUs (sometimes via CPU masks)
-* Begin to understand "locality"
+* Begin to understand *locality*
 * Understand the difference between affinity policies, binding, and mappings
-* Use a simple tool to identify resources available to particular processes
+* Use affinity programs to identify resources available to particular processes
 
 ## Background
 
@@ -47,7 +47,7 @@ Let's start by considering compute resources only (and ignoring memory).
 
 <img src="../figures/computing-architecture.png" width="600"/>
 
-At the bottom of the tree shown above, we see "Processing Units" denoted as "PU"s. A **PU** is the smallest processing unit that can handle a logical thread of execution, i.e. execute its own set of instructions. Multiple PUs are sometimes packaged together into a **core**. PUs have both dedicated and shared hardware resources on a core; for example, floating point units are shared by multiple PUs.
+At the bottom of the tree shown above, we see *Processing Units* denoted as *PUs*. A **PU** is the smallest processing unit that can handle a logical thread of execution, i.e. execute its own set of instructions. Multiple PUs are sometimes packaged together into a **core**. PUs have both dedicated and shared hardware resources on a core; for example, floating point units are shared by multiple PUs.
 
 In our tree, we see **GPU**s, Graphical Processing Units, shown at the same level as cores. In contrast to cores and their PUs, GPUs allow for greater data parallelization by working on vectors of data at once.
 
@@ -85,9 +85,9 @@ In the image below, consider a scenario where we have two processors and two sto
 
 <img src="../figures/numa.png" width="300"/>
 
-We can imagine scenarios where memory is laid out to be equidistant from multiple processors and where multiple processors are in the same NUMA domain. In the architectures we'll consider, however, there will be a one-to-one mapping between NUMA domains and processors. So, all computing resources on a Silicon die will be in the same NUMA domain and will have the same "local" memory.
+We can imagine scenarios where memory is laid out to be equidistant from multiple processors and where multiple processors are in the same NUMA domain. In the architectures we'll consider, however, there will be a one-to-one mapping between NUMA domains and processors. So, all computing resources on a Silicon die will be in the same NUMA domain and will have the same *local* memory.
 
-Our references to "memory" above refer to memory that's transmitted over a frontside bus. In contrast, **cache memory** serves as a faster and closer source of memory, and different cores on the same processor and within the same NUMA domain may have access to different cache.
+Our references to *memory* above refer to memory that's transmitted over a frontside bus. In contrast, **cache memory** serves as a faster and closer source of memory, and different cores on the same processor and within the same NUMA domain may have access to different cache.
 
 In general, cache levels are denoted as `L<N>` where `<N>` denotes the cache level. Lower values of `N` denote smaller and faster levels of cache. In the figure below, we see an example of what the cache hierarchy and layout might look like on a single processor.
 
@@ -95,11 +95,11 @@ In general, cache levels are denoted as `L<N>` where `<N>` denotes the cache lev
 
 In this example cache layout, there are three levels of cache -- `L1`, `L2`, and `L3`. Each core has its own `L1` cache, every two cores share a `L2` cache, and sets of six cores each have a `L3` cache.
 
-Throughout this tutorial, we'll be talking about "locality" and compute resources that are "local" to one another. For example, we might say that a given pair of resources "are local to one another". In this tutorial, when we say resources are local, that usually means those resources share the same NUMA domain. Resources can also be local in a stricter sense, i.e. by sharing L3 or L2 cache.
+Throughout this tutorial, we'll be talking about *locality* and compute resources that are "local" to one another. For example, we might say that a given pair of resources "are local to one another". In this tutorial, when we say resources are local, that usually means those resources share the same NUMA domain. Resources can also be local in a stricter sense, i.e. by sharing L3 or L2 cache.
 
 #### Comprehension question 2
 
-In the cache memory diagram above, how many cores are "local" with respect to a given L3 cache?
+In the cache memory diagram above, how many cores are *local* with respect to a given L3 cache?
 
 **A)** 2
 
@@ -466,10 +466,10 @@ From here on out, we'll stick with `lstopo` for consistency.
 
 In the `lstopo(-no-graphics)` example above, `lstopo` was run on the same node being investigated. `lstopo` also allows you to explore topologies of other machines/systems simply by specifying as an input a `.xml` file that provides information about the system.
 
-For example, you should see a series of `.xml` files in the directory `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml`:
+For example, you should see a series of `.xml` files in the directory `$MAP/topo-xml`:
 
 ```
-/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml$ ls
+$ ls $MAP/topo-xml
 corona.xml
 pascal.xml
 tioga.xml
@@ -479,10 +479,10 @@ rzadams.xml
 Using these files, you should be able to create the outputs for `lstopo-no-graphics` that you'd see on these respective machines, simply by adding `--input <machine name>.xml` to the commands shown above; as an example,
 
 ```
-lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml
+lstopo --input $MAP/topo-xml/rzadams.xml
 ```
 
-should allow you to "see" `RZAdams`'s MI300A architecture, without needing access to `RZAdams` itself.
+should allow you to see `RZAdams`'s MI300A architecture, without needing access to `RZAdams` itself.
 
 In a graphical environment, `lstopo` can also create topology images like the ones shown above. In this tutorial environment, we'll use the text output.
 
@@ -490,17 +490,17 @@ In a graphical environment, `lstopo` can also create topology images like the on
 
 By default, `lstopo` shows the topology of the machine you're logged into. Alternatively, you can pass an `.xml` file describing the topology of a *different* machine to see the topology of that machine.
 
-From your Frontier login shell, try the following:
+From your login shell, try the following:
 
 ```
-lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml
+lstopo --input $MAP/topo-xml/rzadams.xml
 ```
 
-See how this changes the outpput you get simply running `lstopo`!
+See how this changes the output you get simply running `lstopo`
 
-#### Hands-on exercise C: Investigating Frontier nodes with `lstopo`
+#### Hands-on exercise C: Investigating compute nodes with `lstopo`
 
-Let's use `lstopo` again to compare a Frontier login node with a Frontier compute node. First, try running
+Let's use `lstopo` again to compare a login node with a compute node. First, try running
 
 
 ```
@@ -1190,7 +1190,7 @@ janeh@tioga20:~$ lstopo --no-useless-caches --no-io --physical
 
 <img src="../figures/tioga/tioga-no-cache-io-physical.png" width="520"/>
 
-#### Hands-on exercise D: Investigating Frontier nodes with `--only`
+#### Hands-on exercise D: Investigating compute nodes with `--only`
 
 First, run the command
 
@@ -1204,7 +1204,7 @@ to see the number of cores on the login node and
 srun -N 1 -t 1 lstopo --only core
 ```
 
-to see the number of cores on a Frontier compute node.
+to see the number of cores on a compute node.
 
 How are the outputs different? Which type of node exposes more cores?
 
@@ -1254,11 +1254,11 @@ Core L#55
 
 </details>
 
-#### Hands-on exercise E: Investigating Frontier nodes: How many PUs per core?
+#### Hands-on exercise E: Investigating compute nodes: How many PUs per core?
 
 You can add `| wc -l` to a command to count the number of lines in its output. Modifying the commands from the last exercise, you should get a single number if you try `lstopo --only core | wc -l` and `srun -N 1 -t 1 lstopo --only core | wc -l`. Here you're counting the number of cores (one per line) on each node!
 
-Determine the number of cores and PUs (hardware threads) on a Frontier compute node by running the following:
+Determine the number of cores and PUs (hardware threads) on a compute node by running the following:
 
 ```
 srun -N 1 -t 1 lstopo --only core | wc -l
@@ -1291,7 +1291,7 @@ srun: job 5318718 has been allocated resources
 ```
 We have 56 visible cores and 112 visible PUs. Because we have 2x as many visible PUs as visible cores, these nodes do support SMT.
 
-Frontier compute nodes have 64 physical CPU cores, but user allocations normally expose 56 cores because 8 cores are reserved for system use.
+Compute nodes have 64 physical CPU cores, but user allocations normally expose 56 cores because 8 cores are reserved for system use.
 
 
 
@@ -1303,13 +1303,13 @@ Frontier compute nodes have 64 physical CPU cores, but user allocations normally
 Run
 
 ```
-lstopo  --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only core
+lstopo  --input $MAP/topo-xml/rzadams.xml --only core
 ```
 
 and
 
 ```
-lstopo  --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only core | wc -l
+lstopo  --input $MAP/topo-xml/rzadams.xml --only core | wc -l
 ```
 
 to see the full list of cores on `RZAdams`'s nodes and then to tally them.
@@ -1317,12 +1317,12 @@ to see the full list of cores on `RZAdams`'s nodes and then to tally them.
 Now try
 
 ```
-lstopo  --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only PU | wc -l
+lstopo  --input $MAP/topo-xml/rzadams.xml --only PU | wc -l
 ```
 
 to see how many hardware threads there are on the same node.
 
-For contrast, repeat the above using the file `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/tioga.xml`.
+For contrast, repeat the above using the file `$MAP/topo-xml/tioga.xml`.
 
 How many hardware threads are there per node on RZAdams and Tioga?
 
@@ -1340,22 +1340,22 @@ Answer
 A. On RZAdams, there are two hardware threads per core, so we should see twice as many PUs as cores:
 
 ```
-[user@login08.frontier ~]$ lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only core | wc -l
+$ lstopo --input $MAP/topo-xml/rzadams.xml --only core | wc -l
 96
-[user@login08.frontier ~]$ lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml --only PU | wc -l
+$ lstopo --input $MAP/topo-xml/rzadams.xml --only PU | wc -l
 192
 ```
 
 The same is true on Tioga, but there are only 64 cores and 128 hardware threads:
 
 ```
-[user@login08.frontier ~]$ lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/tioga.xml --only core | wc -l
+$ lstopo --input $MAP/topo-xml/tioga.xml --only core | wc -l
 64
-[user@login08.frontier ~]$ lstopo --input /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/tioga.xml --only PU | wc -l
+$ lstopo --input $MAP/topo-xml/tioga.xml --only PU | wc -l
 128
 ```
 
-Note that these counts come from the XML topology files, not from the Frontier login node.
+Note that these counts come from the XML topology files, not from the login node.
 
 </details>
 
@@ -1394,21 +1394,21 @@ janeh@tioga20:~$ hwloc-calc NUMAnode:0.core:8 --intersect PU --physical
 8,72
 ```
 
-#### Hands-on exercise G: Determine the cores on a given NUMAnode (Frontier)
+#### Hands-on exercise G: Determine the cores on a given NUMAnode
 
-Run the following to see the list of cores on the Frontier login node:
+Run the following to see the list of cores on a login node:
 
 ```
 hwloc-calc NUMAnode:0 --intersect core
 ```
 
-and run these to see how cores are spread across the NUMA domains on a Frontier compute node:
+and run these to see how cores are spread across the NUMA domains on a compute node:
 
 ```
 srun -N 1 -t 1 hwloc-calc NUMAnode:0 --intersect core
 srun -N 1 -t 1 hwloc-calc NUMAnode:1 --intersect core
-srun -N 1 -t 1 hwloc-calc NUMAnode:2 --intersect core
-srun -N 1 -t 1 hwloc-calc NUMAnode:3 --intersect core
+srun -N 1 -t 1 hwloc-calc NUMAnode:2 --intersect core  # if applicable
+srun -N 1 -t 1 hwloc-calc NUMAnode:3 --intersect core  # if applicable
 ```
 
 <details>
@@ -1437,7 +1437,8 @@ Expected output
 
 </details>
 
-Remember that the login node and compute node expose different numbers of cores on NUMA domain 0.
+Remember that the login node and compute node might expose different
+numbers of cores on NUMA domain 0.
 
 **Bonus**: Can you use the `--physical` flag to see which 8 cores are reserved for system use on a Frontier compute node?
 <details>
@@ -1481,7 +1482,7 @@ Hint
 </summary>
 
 ```
-hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml <specify core 4 here> --intersect <what are you trying to determine on core 4?>
+hwloc-calc -i $MAP/topo-xml/rzadams.xml <specify core 4 here> --intersect <what are you trying to determine on core 4?>
 ```
 
 </details>
@@ -1494,7 +1495,7 @@ Answer
 </summary>
 
 ```
-[user@login07.frontier ~]$ hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml NUMA:1.core:4 --intersect PU
+$ hwloc-calc -i $MAP/topo-xml/rzadams.xml NUMA:1.core:4 --intersect PU
 56,57
 ```
 
@@ -1529,7 +1530,7 @@ janeh@tioga22:~$ hwloc-calc NUMAnode:0 ~NUMAnode:0.core:0-2
 
 **Comprehension check 4**
 
-Which of these things is not like the others (and produces a different result) on a Frontier login node?
+Which of these things is not like the others (and produces a different result) on a login node?
 
 1) hwloc-calc NUMAnode:0.core:0-3 NUMAnode:0.core:5-15
 2) hwloc-calc NUMAnode:0 NUMAnode:0.core:4
@@ -1566,9 +1567,9 @@ janeh@tioga22:~$ hwloc-calc NUMAnode:0 --taskset
 
 The default mask format is specific to `hwloc`, whereas `--taskset` displays the mask in the format recognized by the taskset command-line program (an alternative command line tool for binding).
 
-#### Hands-on exercise I: Calculating CPU masks on Frontier
+#### Hands-on exercise I: Calculating CPU masks
 
-Start with a simple command to calculate the CPU mask for core 8 on NUMAnode 0 of a Frontier compute node:
+Start with a simple command to calculate the CPU mask for core 8 on NUMAnode 0 of a compute node:
 
 ```
 srun -N 1 -t 1 hwloc-calc NUMAnode:0.core:8
@@ -1736,7 +1737,7 @@ hwloc-bind NUMAnode:1 --membind NUMAnode:0 -- sh
 
 specifies that the task created by `sh` should be run on the compute resources of the 2nd NUMA domain, whereas it should use memory from the resources on the first NUMA domain.
 
-#### Hands-on exercise K: On Frontier, get the compute resources for a given task
+#### Hands-on exercise K: Get the compute resources for a given task
 
 To bind a process to particular resources, use the syntax
 
@@ -1744,13 +1745,7 @@ To bind a process to particular resources, use the syntax
 hwloc-bind <resources to bind to> -- <command to run>
 ```
 
-For this exercise, start an interactive allocation on Frontier:
-
-```
-salloc -N 1 -t 2 -A gen007_train
-```
-
-Then, from the allocation, bind a new shell to cores 0 and 6:
+Bind a new shell to cores 0 and 6:
 
 ```
 hwloc-bind core:0 core:6 -- sh
@@ -1809,8 +1804,9 @@ rzadams1005:~$ hwloc-bind --get
 0x00100004,0x00010040,,0x00100004,0x00010040
 ```
 
-*Hint*: You can solve this with `hwloc-calc` using `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml`.
+*Hint*: You can solve this with `hwloc-calc` using `$MAP/topo-xml/rzadams.xml`.
 
+<!--
 <details>
 <summary>
 
@@ -1823,14 +1819,14 @@ You would need to bind the process `sh` to cores 6, 16, 34, and 52 on RZAdams in
 We can see this by getting the cores associated with the mask via hwloc-calc:
 
 ```
-[user@login07.frontier ~]$ hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml 0x00100004,0x00010040,,0x00100004,0x00010040 --intersect core
+$ hwloc-calc -i $MAP/topo-xml/rzadams.xml 0x00100004,0x00010040,,0x00100004,0x00010040 --intersect core
 6,16,34,52
 ```
 
 Checking that this produces the desired mask,
 
 ```
-[user@login07.frontier ~]$ hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml core:6 core:16 core:34 core:52
+$ hwloc-calc -i $MAP/topo-xml/rzadams.xml core:6 core:16 core:34 core:52
 0x00100004,0x00010040,,0x00100004,0x00010040
 ```
 
@@ -1845,7 +1841,7 @@ janeh@rzadams1005:~$ hwloc-bind --get
 ```
 
 </details>
-
+-->
 
 
 ## Definitions
@@ -1923,9 +1919,6 @@ A. Affinity: Policy for one openMP thread per L3 on Tioga
 
 In the following, we'll use binaries called `mpi+gpu` and `mpi` to report the mappings of each MPI process. `mpi+gpu` will account for both CPUs and GPUs and `mpi` will let you see the mappings of processes to CPUs in isolation.
 
-Usage is straightforward. Use the `-v` option for verbose GPU output and
-the `-h` option for help.
-
 The examples below should help to show how it works! To help illustrate what's going on, some examples will include schematics of tasks distributed across a Tioga node. Each Tioga node, with its 64 cores and 8 GPUs laid out across 4 NUMA domains, will be shown as
 
 <img src="../figures/tioga/Tioga-Mod1-noprocs.png" width="550"/>
@@ -1985,7 +1978,7 @@ tioga12    Task   3/  4 running on 32 CPUs: 48-63,112-127
 
 #### Hands-on exercise M: Try out `mpi` and `mpi+gpu`
 
-First, use `which` to see where the `mpi` and `mpi+gpu` binaries are installed in your Frontier environment:
+First, use `which` to see where the `mpi` and `mpi+gpu` binaries are installed in your environment:
 
 ```
 which mpi
@@ -1996,7 +1989,7 @@ Next, look at the difference in output when you run either of these with a singl
 
 ```
 srun -N 1 -t 1 -n 1 mpi
-srun -N 1 -t 1 -n 1 mpi+gpu
+srun -N 1 -t 1 -n 1 mpi+gpu   # Try on a node with GPUs
 ```
 
 How do results change if you add the flag `-c 3`?
@@ -2069,7 +2062,7 @@ Here we see run a program with 2 processes on `Tioga MI250X`, where all the reso
 
 
 ```
-$ srun -N 1 -t 1 -n 2 -c 32 --cpu-bind=core --gpu-bind=closest  ./mpi+gpu
+$ srun -N 1 -t 1 -n 2 -c 32 --cpu-bind=core --gpu-bind=closest mpi+gpu
 ```
 
 </summary>
@@ -2093,16 +2086,17 @@ tioga12    Task   1/  2 running on 64 CPUs: 32-63,96-127
 https://github.com/LLNL/mpibind/tree/master/affinity
 ```
 
-## Extra Exercises
+## Hands-on Exercises
 
 ### 1. Describe the memory hierarchy of a compute node.
 
-Use `hwloc` and `/lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml` to explore `RZAdams`' MI300A topology. In particular,
+Use `hwloc` and `$MAP/topo-xml/rzadams.xml` to explore `RZAdams`' MI300A topology. In particular,
 
 1. How many cores per `L3` cache does `RZAdams` have?
 2. How many `L3` cache per `NUMAnode`?
 3. How many `L2` caches per node?
 
+<!--
 <details>
 <summary>
 
@@ -2111,18 +2105,22 @@ What to run
 </summary>
 
 ```
-hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml L3:0 --intersect core
-hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml NUMAnode:0 --intersect L3
-hwloc-calc -i /lustre/orion/gen007/world-shared/gmis-wshop/topo-xml/rzadams.xml NUMAnode:0-3 --intersect L2
+hwloc-calc -i $MAP/topo-xml/rzadams.xml L3:0 --intersect core
+hwloc-calc -i $MAP/topo-xml/rzadams.xml NUMAnode:0 --intersect L3
+hwloc-calc -i $MAP/topo-xml/rzadams.xml NUMAnode:0-3 --intersect L2
 ```
 </details>
+-->
 
-### 2. Describe the memory hierarchy of a Frontier compute node
+### 2. Describe the memory hierarchy of a compute node
 
-Use `hwloc` functions to determine how many cores there are per NUMA, per `L3` cache, and per `L2` cache on a Frontier compute node.
+Use `hwloc` functions to determine how many cores there are per NUMA, per `L3` cache, and per `L2` cache on a compute node.
 
+<!--
 Afterwards, you can check yourself with [this picture of a Frontier node](../figures/frontier-node-topology.svg).
+-->
 
+<!--
 <details>
 <summary>
 
@@ -2137,6 +2135,7 @@ hwloc-calc L2:0 --intersect core
 ```
 
 </details>
+-->
 
 ### 3. Identify the GPUs local to a given NUMA domain.
 
@@ -2150,7 +2149,7 @@ hwloc-calc L2:0 --intersect core
 
 ### 5. Determine the resources associated with tasks and threads of an MPI program
 
-Use the `mpi` binary to determine the compute resources to which tasks are assigned in your Frontier environment. For example,
+Use the `mpi` binary to determine the compute resources to which tasks are assigned in your environment. For example,
 
 ```
 srun -N 1 -t 1 -n 6 mpi
@@ -2160,6 +2159,8 @@ asks for six tasks on a single node.
 
 Run `mpi` with 2 and then 3 tasks. How many CPUs are assigned to each task in each case? Does the number of CPUs per task change as the number of tasks increases?
 
+
+<!--
 <details>
 <summary>
 Answer
@@ -2185,6 +2186,15 @@ With Frontier's default binding, each task is assigned one CPU. As the number of
 ```
 
 </details>
+-->
+
+### 6. Measuring local and remote memory bandwidth
+
+Using a program that measures memory bandwidth (stream), measure
+local bandwidth and remote bandwidth on a node with 2 or more NUMA
+domains (either a login or a compute node).
+
+
 
 
 ## References

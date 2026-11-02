@@ -1181,12 +1181,15 @@ Todo: Need to expand.
 3. Tune mpibind’s mapping for GPU-intensive codes.
 -->
 
+These exercises assume mpibind is on by default.
+
+
 ### 1. Determine the resources associated with tasks and threads of an MPI+OpenMP program
 
-Using the `mpi+omp` binary to determine the compute resources to which tasks and threads are assigned on your AWS environment. For example,
+Use the `mpi+omp` binary to determine the compute resources to which tasks and threads are assigned on your environment. For example,
 
 ```
-OMP_NUM_THREADS=3 srun -p<QUEUE> -t1 -N1 -n6 mpi+omp
+OMP_NUM_THREADS=3 flux run -t1 -N1 -n6 -x mpi+omp
 ```
 
 asks for six tasks on a single node, with three threads per task.
@@ -1195,19 +1198,76 @@ asks for six tasks on a single node, with three threads per task.
 2. Run `mpi+omp` with 3 tasks and 6 threads. How has the mapping of workers to hardware changed? Do all tasks have access to similar resources? Do all threads have access to similar resources?
 3. In each of the above runs, how many tasks were assigned to each NUMA domain? How many NUMA domains were assigned to each task?
 
+<!--
+[eleonbor@lrdn0248 pcluster]$ OMP_NUM_THREADS=3 flux run -t1 -N1 -n6 -x mpi+omp | sort -k3
+lrdn0248.leonardo.local Task   0/  6 Thread   0/  3 with  1 cpus: 0
+lrdn0248.leonardo.local Task   0/  6 Thread   1/  3 with  1 cpus: 1
+lrdn0248.leonardo.local Task   0/  6 Thread   2/  3 with  1 cpus: 2
+lrdn0248.leonardo.local Task   1/  6 Thread   0/  3 with  1 cpus: 3
+lrdn0248.leonardo.local Task   1/  6 Thread   1/  3 with  1 cpus: 4
+lrdn0248.leonardo.local Task   1/  6 Thread   2/  3 with  1 cpus: 5
+lrdn0248.leonardo.local Task   2/  6 Thread   0/  3 with  1 cpus: 6
+lrdn0248.leonardo.local Task   2/  6 Thread   1/  3 with  1 cpus: 7
+lrdn0248.leonardo.local Task   2/  6 Thread   2/  3 with  1 cpus: 8
+lrdn0248.leonardo.local Task   3/  6 Thread   0/  3 with  1 cpus: 9
+lrdn0248.leonardo.local Task   3/  6 Thread   1/  3 with  1 cpus: 10
+lrdn0248.leonardo.local Task   3/  6 Thread   2/  3 with  1 cpus: 11
+lrdn0248.leonardo.local Task   4/  6 Thread   0/  3 with  1 cpus: 12
+lrdn0248.leonardo.local Task   4/  6 Thread   1/  3 with  1 cpus: 13
+lrdn0248.leonardo.local Task   4/  6 Thread   2/  3 with  1 cpus: 12
+lrdn0248.leonardo.local Task   5/  6 Thread   0/  3 with  1 cpus: 14
+lrdn0248.leonardo.local Task   5/  6 Thread   1/  3 with  1 cpus: 15
+lrdn0248.leonardo.local Task   5/  6 Thread   2/  3 with  1 cpus: 14
+
+[eleonbor@lrdn0248 pcluster]$ OMP_NUM_THREADS=6 flux run -t1 -N1 -n2 -x mpi+omp | sort -k3
+lrdn0248.leonardo.local Task   0/  2 Thread   0/  6 with  1 cpus: 0
+lrdn0248.leonardo.local Task   0/  2 Thread   1/  6 with  1 cpus: 2
+lrdn0248.leonardo.local Task   0/  2 Thread   2/  6 with  1 cpus: 4
+lrdn0248.leonardo.local Task   0/  2 Thread   3/  6 with  1 cpus: 5
+lrdn0248.leonardo.local Task   0/  2 Thread   4/  6 with  1 cpus: 6
+lrdn0248.leonardo.local Task   0/  2 Thread   5/  6 with  1 cpus: 7
+lrdn0248.leonardo.local Task   1/  2 Thread   0/  6 with  1 cpus: 8
+lrdn0248.leonardo.local Task   1/  2 Thread   1/  6 with  1 cpus: 10
+lrdn0248.leonardo.local Task   1/  2 Thread   2/  6 with  1 cpus: 12
+lrdn0248.leonardo.local Task   1/  2 Thread   3/  6 with  1 cpus: 13
+lrdn0248.leonardo.local Task   1/  2 Thread   4/  6 with  1 cpus: 14
+lrdn0248.leonardo.local Task   1/  2 Thread   5/  6 with  1 cpus: 15
+
+[eleonbor@lrdn0248 pcluster]$ OMP_NUM_THREADS=6 flux run -t1 -N1 -n3 -x mpi+omp | sort -k3
+lrdn0248.leonardo.local Task   0/  3 Thread   0/  6 with  1 cpus: 0
+lrdn0248.leonardo.local Task   0/  3 Thread   1/  6 with  1 cpus: 1
+lrdn0248.leonardo.local Task   0/  3 Thread   2/  6 with  1 cpus: 2
+lrdn0248.leonardo.local Task   0/  3 Thread   3/  6 with  1 cpus: 3
+lrdn0248.leonardo.local Task   0/  3 Thread   4/  6 with  1 cpus: 4
+lrdn0248.leonardo.local Task   0/  3 Thread   5/  6 with  1 cpus: 5
+lrdn0248.leonardo.local Task   1/  3 Thread   0/  6 with  1 cpus: 6
+lrdn0248.leonardo.local Task   1/  3 Thread   1/  6 with  1 cpus: 7
+lrdn0248.leonardo.local Task   1/  3 Thread   2/  6 with  1 cpus: 8
+lrdn0248.leonardo.local Task   1/  3 Thread   3/  6 with  1 cpus: 9
+lrdn0248.leonardo.local Task   1/  3 Thread   4/  6 with  1 cpus: 10
+lrdn0248.leonardo.local Task   1/  3 Thread   5/  6 with  1 cpus: 6
+lrdn0248.leonardo.local Task   2/  3 Thread   0/  6 with  1 cpus: 11
+lrdn0248.leonardo.local Task   2/  3 Thread   1/  6 with  1 cpus: 12
+lrdn0248.leonardo.local Task   2/  3 Thread   2/  6 with  1 cpus: 13
+lrdn0248.leonardo.local Task   2/  3 Thread   3/  6 with  1 cpus: 14
+lrdn0248.leonardo.local Task   2/  3 Thread   4/  6 with  1 cpus: 15
+lrdn0248.leonardo.local Task   2/  3 Thread   5/  6 with  1 cpus: 11
+-->
 
 ### 2. Compare mappings without mpibind.
 
-In your AWS environment, `mpibind` is used by default. If you don't want it, you have to turn it off explicitly by adding `--mpibind=off` to your `srun` command. For example,
+In your environment, `mpibind` is used by default. If you don't want
+it, you have to turn it off explicitly by adding `-o mpibind=off` to
+your `flux run` command. For example,
 
 ```
-OMP_NUM_THREADS=3 srun -p<QUEUE> -t1 -N1 -n6 mpi+omp
+OMP_NUM_THREADS=3 flux run -t1 -N1 -n6 -x mpi+omp
 ```
 
 uses `mpibind` and the following run does not:
 
 ```
-OMP_NUM_THREADS=3 srun -p<QUEUE> -t1 -N1 -n6 --mpibind=off mpi+omp
+OMP_NUM_THREADS=3 flux run -t1 -N1 -n6 -x -o mpibind=off mpi+omp
 ```
 
 Repeat the exercise above with `mpibind` set to `off`:
@@ -1216,27 +1276,88 @@ Repeat the exercise above with `mpibind` set to `off`:
 2. Run `mpi+omp` with 3 tasks and 6 threads and without `mpibind`. How has the number of CPUs per task changed? How has the resource set for each thread changed?
 3. How many tasks were assigned to each NUMA domain? How many NUMA domains were assigned to each task?
 
-### 3. Tune mpibind’s mapping for GPU-intensive codes
+<!--
+[eleonbor@lrdn0248 pcluster]$ OMP_NUM_THREADS=6 flux run -t1 -N1 -n2 -x -o mpibind=off mpi+omp | sort -k3
+lrdn0248.leonardo.local Task   0/  2 Thread   0/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  2 Thread   1/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  2 Thread   2/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  2 Thread   3/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  2 Thread   4/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  2 Thread   5/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   0/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   1/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   2/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   3/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   4/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  2 Thread   5/  6 with 32 cpus: 0-31
 
-By default, `mpibind` prioritizes CPUs and CPU locality when mapping workers to hardware. To change `mpibind`'s focus to GPUs, the flag `MPIBIND=gpu` must be added to your `srun` command.
+[eleonbor@lrdn0248 pcluster]$ OMP_NUM_THREADS=6 flux run -t1 -N1 -n3 -x -o mpibind=off mpi+omp | sort -k3
+lrdn0248.leonardo.local Task   0/  3 Thread   0/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  3 Thread   1/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  3 Thread   2/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  3 Thread   3/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  3 Thread   4/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   0/  3 Thread   5/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   0/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   1/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   2/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   3/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   4/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   1/  3 Thread   5/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   0/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   1/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   2/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   3/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   4/  6 with 32 cpus: 0-31
+lrdn0248.leonardo.local Task   2/  3 Thread   5/  6 with 32 cpus: 0-31
+-->
 
-In your AWS environment, run
+
+### 3. Tune mpibind’s mapping for CPUs
+
+On systems with GPUs, `mpibind` prioritizes GPUs and GPU locality when
+mapping workers to hardware. To change `mpibind`'s focus to CPUs, add
+`-o mpibind=gpu:0` to your `flux run` command.
+
+In your environment with GPUs, run
 
 ```
-srun -p<QUEUE> -t1 -N1 -n3 --mpibind=off mpi+omp
+flux run -t1 -N1 -n4 -x mpi+gpu
 ```
 
 and
 
 ```
-MPIBIND=gpu srun -p<QUEUE> -t1 -N1 -n3 --mpibind=off mpi+omp
+flux run -t1 -N1 -n4 -x -o mpibind=gpu:0 mpi+gpu
 ```
 
-1. Do the mapping and distribution of compute resources to tasks change when `mpibind` is tuned for GPUs?
-2. How many GPUs are associated with each NUMA domain on our AWS nodes? Is this number the same for all NUMA domains?
+1. Do the mapping and distribution of compute resources to tasks
+   change when `mpibind` is not tuned for GPUs?
+2. How many GPUs are associated with each NUMA domain on your nodes? Is this number the same for all NUMA domains?
 3. Why did the mapping/distribution of compute resources change or not change?
 
 
+<!--
+[eleonbor@lrdn0248 pcluster]$ flux run -t1 -N1 -n4 -x mpi+gpu | sort 
+  0 lrdn0248.leonardo.local   1 GPUs: 0000:1D:00.0 
+  0 lrdn0248.leonardo.local   4 CPUs: 0-3
+  1 lrdn0248.leonardo.local   1 GPUs: 0000:56:00.0 
+  1 lrdn0248.leonardo.local   4 CPUs: 4-7
+  2 lrdn0248.leonardo.local   1 GPUs: 0000:8F:00.0 
+  2 lrdn0248.leonardo.local   4 CPUs: 8-11
+  3 lrdn0248.leonardo.local   1 GPUs: 0000:C8:00.0 
+  3 lrdn0248.leonardo.local   4 CPUs: 12-15
+
+[eleonbor@lrdn0248 pcluster]$ flux run -t1 -N1 -n4 -x -o mpibind=gpu:0 mpi+gpu | sort 
+  0 lrdn0248.leonardo.local   2 GPUs: 0000:1D:00.0 0000:56:00.0 
+  0 lrdn0248.leonardo.local   8 CPUs: 0-7
+  1 lrdn0248.leonardo.local   2 GPUs: 0000:8F:00.0 0000:C8:00.0 
+  1 lrdn0248.leonardo.local   8 CPUs: 8-15
+  2 lrdn0248.leonardo.local   0 GPUs: 
+  2 lrdn0248.leonardo.local   8 CPUs: 16-23
+  3 lrdn0248.leonardo.local   0 GPUs: 
+  3 lrdn0248.leonardo.local   8 CPUs: 24-31
+-->
 
 ## References
 

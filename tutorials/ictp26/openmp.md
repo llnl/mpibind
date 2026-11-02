@@ -138,7 +138,7 @@ We might envision this as
 
 <img src="../figures/module4_threadstocores.png" width="600"/>
 
-In this example, for task 0, we bind thread 0 to core 0, thread 1 to core 1, ..., thread 3 to core 3. For task 1, we bind thread 0 to core 18, thread 1 to core 19, ..., thread 3 to core 21. The four threads associated with each socket are assigned to the first four cores on their socket. (Remember that in this architecture a core is comprised of two hardware threads (CPUs).)
+In this example, for task 0, we bind thread 0 to core 0, thread 1 to core 1, ..., thread 3 to core 3. For task 1, we bind thread 0 to core 18, thread 1 to core 19, ..., thread 3 to core 21. The four threads associated with each socket are assigned to the first four cores on their socket. Remember that in this architecture a core is comprised of two hardware threads (CPUs).
 
 
 
@@ -237,53 +237,120 @@ Note that because we used a single task and `OMP_NUM_THREADS=4`, a total of four
 
 ## Hands-on exercises
 
-### 1. Assign OpenMP threads core-wise and threadwise with `OMP_PLACES`.
+While these exercises can be run on any compute node, they are better
+suited for SMT architectures with more than 1 hardware thread per core
+enabled.
 
-Consider the output for each of the following three commands run in your AWS environments, in which `mpibind=off`:
+
+### 1. Assign OpenMP threads core-wise and thread-wise with `OMP_PLACES`
+
+Consider the output for each of the following three commands run in your environment:
 
 ```
-OMP_NUM_THREADS=3 srun -N1 -n2 -ppvis -t1 --mpibind=off  ./mpi+omp
-OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2 -ppvis -t1 --mpibind=off  ./mpi+omp
-OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -ppvis -t1 --mpibind=off  ./mpi+omp
+OMP_NUM_THREADS=3 srun -N1 -n2 -t1 mpi+omp
+OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2 -t1 mpi+omp
+OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -t1 mpi+omp
 ```
 
-1. How many CPUs are assigned to each thread when we don't use `OMP_PLACES` to specify how threads should be assigned? How many CPUs are assigned per OpenMP thread when OpenMP threads are assigned (hardware)thread-wise and core-wise?
+<!--
+[eleonbor@login07 pcluster]$ OMP_NUM_THREADS=3 srun -N1 -n2  -t1  mpi+omp
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with 112 cpus: 0-111
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with 112 cpus: 0-111
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with 112 cpus: 0-111
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with 112 cpus: 0-111
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with 112 cpus: 0-111
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with 112 cpus: 0-111
+
+[eleonbor@login07 pcluster]$ OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 mpi+omp
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 1
+
+[eleonbor@login07 pcluster]$ OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2  -t1 mpi+omp
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 1
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
+-->
+
+
+1. How many CPUs are assigned to each thread when we don't use `OMP_PLACES` to specify how threads should be assigned? How many CPUs are assigned per OpenMP thread when OpenMP threads are assigned thread-wise and core-wise?
 2. In each of these commands, how many OpenMP threads are assigned to each CPU?
-3. Add in the Slurm flag `--cpu_bind=sockets` from Module 3 so that tasks aren't spread across sockets and run
+3. Add in the Slurm flag `--cpu_bind=sockets` so that tasks aren't spread across sockets and run
 
-```
-OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
-OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
-```
+   ```
+   OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets mpi+omp
+   OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2  -t1 --cpu_bind=sockets mpi+omp
+   ```
+
+   Note that in some cases, you may need to specify `-c<ncores-per-socket>` for the
+process affinity to work corrctly.
 
 4. Did the number of CPUs per OpenMP thread change? Did the number of OpenMP threads per CPU change?
+
+
+<!--
+[eleonbor@login07 pcluster]$ OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets -c56 mpi+omp
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 56
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 57
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 58
+-->
+
 
 ### 2. Map OpenMP threads to hardware resources using the close and spread policies. Show the mappings.
 
 1. Add `OMP_PROC_BIND` to the last `srun` command and observe the effects of the `close` and `spread` policies.
 
 ```
-OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
-OMP_PROC_BIND=spread OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
+OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -t1 --cpu_bind=sockets mpi+omp
+OMP_PROC_BIND=spread OMP_NUM_THREADS=3 OMP_PLACES=threads srun -N1 -n2 -t1 --cpu_bind=sockets mpi+omp
 ```
 
 2. With the `close` policy, how many OpenMP threads are there **per core**? With the `spread` policy?
 3. Compare the resources assigned to the 3 threads of `Task 0` with the `close` and `spread` policy. What dedicated resources do each of these threads have with the `spread` policy that were shared between threads for the `close` policy?
 
-### 3. Replicate the mapping from the close policy via an explicit assignment of threads to cores.
+
+<!--
+[eleonbor@login07 pcluster]$ OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets -c56 mpi+omp
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 56
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 57
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 58
+
+[eleonbor@login07 pcluster]$ OMP_PROC_BIND=spread OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets -c56 mpi+omp
+lrdn4975.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4975.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 38
+lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 19
+lrdn4975.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 56
+lrdn4975.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 94
+lrdn4975.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 75
+-->
+
+
+### 3. Replicate the mapping from the close policy via an explicit assignment of OpenMP threads to cores.
 
 Reproduce the mapping for
 
 ```
-OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
+OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets mpi+omp
 ```
 
-observed in your AWS environment without the use of `OMP_PROC_BIND=close`. Instead, use `OMP_PLACES` to specify the exact cores where you want to place your threads.
+observed in your environment without the use of `OMP_PROC_BIND=close`. Instead, use `OMP_PLACES` to specify the exact cores where you want to place your threads.
 
 For example, to recreate the mapping for this command observed on `Pascal`,
 
 ```
-janeh@pascal83:~$ OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2 -ppvis -t1 --cpu_bind=sockets --mpibind=off  ./mpi+omp
+janeh@pascal83:~$ OMP_PROC_BIND=close OMP_NUM_THREADS=3 OMP_PLACES=cores srun -N1 -n2  -t1 --cpu_bind=sockets   ./mpi+omp
 pascal18 Task   0/  2 Thread   0/  3 with  2 cpus: 0,36
 pascal18 Task   0/  2 Thread   1/  3 with  2 cpus: 1,37
 pascal18 Task   0/  2 Thread   2/  3 with  2 cpus: 2,38
@@ -292,8 +359,47 @@ pascal18 Task   1/  2 Thread   1/  3 with  2 cpus: 19,55
 pascal18 Task   1/  2 Thread   2/  3 with  2 cpus: 20,56
 ```
 
-you would want to use `OMP_PLACES` to specify that `Task 1, Thread 0` maps to core 18, that `TASK 1, Thread 1` maps to core 19, etc.
+you would want to use `OMP_PLACES` to specify that `Task 1, Thread 0` maps to core 18, that `Task 1, Thread 1` maps to core 19, etc.
 
+Finally, you can try to extend the previous command to assign 2 CPUs
+to each thread (can be hardware threads or cores), but we will learn
+how to handle this case when we cover the GPU module.
+
+
+<!--
+[eleonbor@login07 pcluster]$ OMP_PLACES={0},{1},{2},{56},{57},{58} OMP_NUM_THREADS=3 srun -N1 -n2  -t1 --cpu_bind=sockets -c56 mpi+omp
+
+libgomp: Number of places reduced from 6 to 3 because some places didn't contain any usable logical CPUs
+
+libgomp: Number of places reduced from 6 to 3 because some places didn't contain any usable logical CPUs
+lrdn4991.leonardo.local Task   0/  2 Thread   0/  3 with  1 cpus: 0
+lrdn4991.leonardo.local Task   0/  2 Thread   2/  3 with  1 cpus: 2
+lrdn4991.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
+lrdn4991.leonardo.local Task   1/  2 Thread   0/  3 with  1 cpus: 56
+lrdn4991.leonardo.local Task   1/  2 Thread   2/  3 with  1 cpus: 58
+lrdn4991.leonardo.local Task   1/  2 Thread   1/  3 with  1 cpus: 57
+
+
+[eleonbor@login07 pcluster]$ OMP_PLACES={0:3},{3:3},{6:3},{56:3},{59:3},{62:3} OMP_NUM_THREADS=3 srun -N1 -n2  -t1 --cpu_bind=sockets -c56 mpi+omp
+
+libgomp: Number of places reduced from 6 to 3 because some places didn't contain any usable logical CPUs
+
+libgomp: Logical CPU number 64 out of range
+
+libgomp: Invalid value for environment variable OMP_PLACES
+lrdn4991.leonardo.local Task   0/  2 Thread   0/  3 with 56 cpus: 0-55
+lrdn4991.leonardo.local Task   0/  2 Thread   1/  3 with 56 cpus: 0-55
+lrdn4991.leonardo.local Task   0/  2 Thread   2/  3 with 56 cpus: 0-55
+lrdn4991.leonardo.local Task   1/  2 Thread   0/  3 with  3 cpus: 56-58
+lrdn4991.leonardo.local Task   1/  2 Thread   1/  3 with  3 cpus: 59-61
+lrdn4991.leonardo.local Task   1/  2 Thread   2/  3 with  3 cpus: 62-64
+-->
+
+
+<!--
+OMP_DISPLAY_AFFINITY=TRUE
+OMP_DISPLAY_ENV=TRUE
+-->
 
 
 ## References

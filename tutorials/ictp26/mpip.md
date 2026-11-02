@@ -156,3 +156,14 @@ Barrier              5       1    0.1087    0.1087    0.1087      3      3
 What are the most time consuming communication operations?
 
 What is the balance of communication to application time?
+
+### Selectively profile a section of your code
+
+Read the *Controlling Profiling Scope* section of the [mpiP
+guide](https://software.llnl.gov/mpiP/).
+
+Use the `MPI_Pcontrol()` function to set the scope of the
+code to analyze.
+
+Remember to disable profiling initially at `MPI_Init()` so that only
+the section of interest is profiled.

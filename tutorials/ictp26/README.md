@@ -22,10 +22,10 @@ Lawrence Livermore National Laboratory
 1. [Process Affinity with Slurm](map-cpu.md)
 1. [Thread Affinity with OpenMP](openmp.md)
 1. [Mapping Kernels to GPUs](map-gpu.md)
-1. [Resource Manager Affinity with Flux](flux.md)
+1. [The Flux Resource Manager](flux.md)
 1. [Automatic Affinity with mpibind](mpibind.md)
-1. [MPI Observations](mpi-misc.md)
-1. [MPI load imbalance](mpip.md)
+1. [MPI Practical Guidance](mpi-misc.md)
+1. [MPI Load Imbalance](mpip.md)
 
 <!--
 Special topics:
