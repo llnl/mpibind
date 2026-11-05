@@ -289,7 +289,7 @@ lrdn4975.leonardo.local Task   0/  2 Thread   1/  3 with  1 cpus: 1
    ```
 
    Note that in some cases, you may need to specify `-c<ncores-per-socket>` for the
-process affinity to work corrctly.
+process affinity to work correctly.
 
 4. Did the number of CPUs per OpenMP thread change? Did the number of OpenMP threads per CPU change?
 

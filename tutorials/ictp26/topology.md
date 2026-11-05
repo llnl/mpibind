@@ -123,7 +123,7 @@ Each L2 cache has 2 cores, and there are 3 L2 caches per L3 cache.
 
 ## Example architectures
 
-The topologies of a few example architectures are summarized and diagramed [here](https://github.com/LLNL/mpibind/blob/master/tutorials/cug24/archs.md).
+The topologies of a few example architectures are summarized and diagramed [here](../common/archs.md).
 
 We'll focus on `Tioga` and `RZAdams` --- early access systems for El Capitan --- in examples throughout the coming modules. `Tioga` has MI250X nodes (including MI250X GPUs) and `RZAdams` is composed of nodes with MI300A APUs!
 

@@ -125,7 +125,7 @@ consecutive tasks to consecutive nodes in a round-robin manner.
 
 The `nopack` option distributes the tasks among nodes evenly, while
 the `pack` option packs as many tasks as possible on one node before using
-the next one, with the exception that all nodes will receive at least one task. The pack option applies to the block distribution method
+the next one, *with the exception that all nodes will receive at least one task*. The pack option applies to the block distribution method
 only.
 
 To understand these methods, let us try a few examples.
