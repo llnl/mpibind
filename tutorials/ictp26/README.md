@@ -24,10 +24,11 @@ Lawrence Livermore National Laboratory
 1. [Mapping Kernels to GPUs](map-gpu.md)
 1. [The Flux Resource Manager](flux.md)
 1. [Automatic Affinity with mpibind](mpibind.md)
-1. [MPI Practical Guidance](mpi-misc.md)
+1. MPI+OpenMP Mapping Configurations
 1. [MPI Load Imbalance](mpip.md)
+1. [MPI Practical Guidance](mpi-misc.md)
 
 <!--
 Special topics:
-   * MPI standard specification -more recent features
+   * Recent features of the MPI standard
 -->

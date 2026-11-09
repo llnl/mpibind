@@ -295,7 +295,7 @@ Check if the MPI implementation supports turning on background threads via envir
 ## 5. Diagnosing scaling results
 
 When transitioning MPI applications from a single process to multiple
-processes, or from a single node to multiple cluster nodes, "weird"
+processes, or from a single node to multiple cluster nodes, *weird*
 scaling behavior is often encountered. Common symptoms include:
 *   Performance **dropping sharply** when crossing from 1 node to 2 nodes.
 *   Speedups that **plateau** after a certain number of cores.
