@@ -79,7 +79,6 @@ int get_gpu_info(int devid, char *buf)
   cudaDeviceProp prop;
   cudaError_t err; 
   int nc = 0;
-  float ghz;
   
   err = cudaGetDeviceProperties(&prop, devid);
   if ( err ) {
@@ -87,18 +86,13 @@ int get_gpu_info(int devid, char *buf)
     return -1;
   }
 
-#if CUDART_VERSION >= 13000
   int clockRate;
   err = cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, devid);
-  if ( err )
-  {
+  if ( err ) {
     fprintf(stderr, "Could not get clock rate for GPU %d\n", devid);
     return -1;
   }
-  ghz = clockRate / 1000.0 / 1000.0;
-#else
-  ghz = prop.clockRate / 1000.0 / 1000.0;
-#endif
+  float ghz = clockRate / 1e6f;
 
 #if 1
   nc += sprintf(buf+nc, "\tName: %s\n", prop.name);
