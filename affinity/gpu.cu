@@ -86,7 +86,14 @@ int get_gpu_info(int devid, char *buf)
     return -1;
   }
 
-  float ghz = prop.clockRate / 1000.0 / 1000.0; 
+  int clockRate;
+  err = cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, devid);
+  if ( err ) {
+    fprintf(stderr, "Could not get clock rate for GPU %d\n", devid);
+    return -1;
+  }
+  float ghz = clockRate / 1e6f;
+
 #if 1
   nc += sprintf(buf+nc, "\tName: %s\n", prop.name);
   nc += sprintf(buf+nc, "\tPCI domain ID 0x%x\n", prop.pciDomainID);
@@ -143,7 +150,3 @@ int get_gpu_info_all(char *buf)
   
   return nc; 
 }
-
-
-
-
